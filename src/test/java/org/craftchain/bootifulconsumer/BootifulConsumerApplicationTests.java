@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
+import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +21,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-@AutoConfigureWireMock(port = 8080)
+@AutoConfigureStubRunner(ids = "org.craftchain:bootiful-reactive:+:8080", stubsMode = StubRunnerProperties.StubsMode.LOCAL)
+//@AutoConfigureWireMock(port = 8080)
 public class BootifulConsumerApplicationTests {
 
 	@Autowired
@@ -28,21 +31,21 @@ public class BootifulConsumerApplicationTests {
 	@Test
 	public void contextLoads() {
 
-		var json = " [ { \"id\":\"1\" , \"reservationName\":\"Anicet\"  } ] ";
-
-		stubFor(WireMock.get(WireMock.urlEqualTo("/reservations"))
-				.willReturn(WireMock
-						.aResponse()
-						.withBody(json)
-						.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-						.withStatus(HttpStatus.OK.value())));
+//		var json = " [ { \"id\":\"1\" , \"reservationName\":\"Anicet\"  } ] ";
+//
+//		stubFor(WireMock.get(WireMock.urlEqualTo("/reservations"))
+//				.willReturn(WireMock
+//						.aResponse()
+//						.withBody(json)
+//						.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//						.withStatus(HttpStatus.OK.value())));
 
 
 		Flux<Reservation> reservations = this.client.getAllReservations();
 
 		StepVerifier
 				.create(reservations)
-				.expectNextMatches(r -> r.getId() != null && r.getReservationName().equalsIgnoreCase("anicet"))
+				.expectNextMatches(r -> r.getId() != null && r.getName().equalsIgnoreCase("anicet"))
 				.verifyComplete();
 	}
 
